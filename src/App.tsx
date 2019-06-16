@@ -1,13 +1,43 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { createGlobalStyle } from "styled-components";
 
+import { HackerNewsItem as BaseHackerNewsItem } from "./components/HackerNewsItem";
 import { LoadingIndicator } from "./components/LoadingIndicator";
 import { LiveData } from "./components/LiveData";
-import { HackerNewsClient } from "./HackerNewsClient";
+import {
+  Header,
+  Title as HeaderTitle,
+  Link as HeaderLink
+} from "./components/Header";
 
+import { HackerNewsClient } from "./HackerNewsClient";
+import { systemFont } from "./theme";
+import { ExternalLink } from "./components/ExternalLink";
+
+const GlobalStyles = createGlobalStyle`
+  html,
+  body {
+    margin: 0;
+  }
+
+  body {
+    font-family: ${systemFont};
+  }
+`;
+
+const Page = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+`;
 
 const Feed = styled(LiveData)`
-  height: 100vh;
+  flex-grow: 1;
+  padding: 1em;
+`;
+
+const HackerNewsItem = styled(BaseHackerNewsItem)`
+  margin-bottom: 20px;
 `;
 
 type Props = {
@@ -18,13 +48,30 @@ const App: React.FC<Props> = ({ client }) => {
   const Loading = <LoadingIndicator>Loading...</LoadingIndicator>;
 
   return (
-    <Feed
-      LoadingIndicator={Loading}
-      iterator={client.fetchNewStories()}
-      buffer={{ bottom: 100 }}
-    >
-      {items => items.map(item => <p key={item.id}>{item.id}</p>)}
-    </Feed>
+    <Page>
+      <GlobalStyles />
+      <Header>
+        <HeaderTitle>Doist Hacker News Client</HeaderTitle>
+        <HeaderLink as={ExternalLink} href="https://alexlafroscia.com">
+          Created by Alex LaFroscia
+        </HeaderLink>
+        <HeaderLink
+          as={ExternalLink}
+          href="https://github.com/alexlafroscia/doist-hacker-news-clone"
+        >
+          Source Code
+        </HeaderLink>
+      </Header>
+      <Feed
+        LoadingIndicator={Loading}
+        iterator={client.fetchNewStories()}
+        buffer={{ bottom: 200 }}
+      >
+        {items =>
+          items.map(item => <HackerNewsItem key={item.id} item={item} />)
+        }
+      </Feed>
+    </Page>
   );
 };
 
