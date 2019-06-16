@@ -44,35 +44,29 @@ type Props = {
   client: HackerNewsClient;
 };
 
-const App: React.FC<Props> = ({ client }) => {
-  const Loading = <LoadingIndicator>Loading...</LoadingIndicator>;
-
-  return (
-    <Page>
-      <GlobalStyles />
-      <Header>
-        <HeaderTitle>Doist Hacker News Client</HeaderTitle>
-        <HeaderLink as={ExternalLink} href="https://alexlafroscia.com">
-          Created by Alex LaFroscia
-        </HeaderLink>
-        <HeaderLink
-          as={ExternalLink}
-          href="https://github.com/alexlafroscia/doist-hacker-news-clone"
-        >
-          Source Code
-        </HeaderLink>
-      </Header>
-      <Feed
-        LoadingIndicator={Loading}
-        iterator={client.fetchNewStories()}
-        buffer={{ bottom: 200 }}
+const App: React.FC<Props> = ({ client }) => (
+  <Page>
+    <GlobalStyles />
+    <Header>
+      <HeaderTitle>Doist Hacker News Client</HeaderTitle>
+      <HeaderLink as={ExternalLink} href="https://alexlafroscia.com">
+        Created by Alex LaFroscia
+      </HeaderLink>
+      <HeaderLink
+        as={ExternalLink}
+        href="https://github.com/alexlafroscia/doist-hacker-news-clone"
       >
-        {items =>
-          items.map(item => <HackerNewsItem key={item.id} item={item} />)
-        }
-      </Feed>
-    </Page>
-  );
-};
+        Source Code
+      </HeaderLink>
+    </Header>
+    <Feed
+      LoadingIndicator={LoadingIndicator}
+      iterator={client.fetchNewStories()}
+      buffer={{ bottom: 200 }}
+    >
+      {items => items.map(item => <HackerNewsItem key={item.id} item={item} />)}
+    </Feed>
+  </Page>
+);
 
 export default App;

@@ -1,8 +1,8 @@
 import React, {
+  ComponentType,
   FC,
-  ReactElement,
   ReactNode,
-  cloneElement,
+  RefAttributes,
   useEffect,
   useRef,
   useState
@@ -13,7 +13,7 @@ import {
 } from "../hooks/useComponentIsVisible";
 
 type Props<T = any> = {
-  LoadingIndicator: ReactElement;
+  LoadingIndicator: ComponentType<RefAttributes<HTMLDivElement>>;
   buffer?: BufferOptions;
   children: (items: Array<T>) => ReactNode;
   iterator: AsyncIterableIterator<T>;
@@ -35,11 +35,6 @@ const LiveData: FC<Props> = ({
   const [items, setItems] = useState<Array<any>>([]);
   const outerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
-
-  // eslint-disable-next-line no-undef
-  const loadingIndicator = cloneElement(LoadingIndicator, {
-    ref: loadingRef
-  });
 
   const loadingIndicatorIsVisible = useComponentIsVisible(
     loadingRef,
@@ -66,7 +61,7 @@ const LiveData: FC<Props> = ({
   return (
     <div ref={outerRef} {...rest}>
       {children(items)}
-      {loadingIndicator}
+      <LoadingIndicator ref={loadingRef} />
     </div>
   );
 };
