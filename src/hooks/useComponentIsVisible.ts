@@ -1,8 +1,16 @@
 import { RefObject, useEffect, useMemo, useState } from "react";
 
-function useComponentIsVisible(
+export type BufferOptions = {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export function useComponentIsVisible(
   targetRef: RefObject<HTMLElement>,
-  rootRef: RefObject<HTMLElement>
+  rootRef: RefObject<HTMLElement>,
+  { top = 0, bottom = 0, left = 0, right = 0 }: BufferOptions = {}
 ) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -10,12 +18,15 @@ function useComponentIsVisible(
     setIsVisible(entry.isIntersecting);
   };
 
+  const rootMargin = `${top}px ${right}px ${bottom}px ${left}px`;
+
   const intersectionObserver = useMemo(
     () =>
       new IntersectionObserver(handleVisibilityChange, {
-        root: rootRef.current
+        root: rootRef.current,
+        rootMargin
       }),
-    [rootRef]
+    [rootRef, rootMargin]
   );
 
   useEffect(function() {
@@ -30,5 +41,3 @@ function useComponentIsVisible(
 
   return isVisible;
 }
-
-export { useComponentIsVisible };

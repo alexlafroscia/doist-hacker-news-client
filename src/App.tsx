@@ -15,7 +15,11 @@ const App: React.FC = () => {
   const Loading = <LoadingIndicator>Loading...</LoadingIndicator>;
 
   return (
-    <Feed LoadingIndicator={Loading} iterator={client.fetchNewStories()}>
+    <Feed
+      LoadingIndicator={Loading}
+      iterator={client.fetchNewStories()}
+      buffer={{ bottom: 100 }}
+    >
       {items => items.map(item => <p key={item.id}>{item.id}</p>)}
     </Feed>
   );

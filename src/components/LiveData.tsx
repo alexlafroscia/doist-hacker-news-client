@@ -7,12 +7,16 @@ import React, {
   useRef,
   useState
 } from "react";
-import { useComponentIsVisible } from "../hooks/useComponentIsVisible";
+import {
+  BufferOptions,
+  useComponentIsVisible
+} from "../hooks/useComponentIsVisible";
 
 type Props<T = any> = {
   LoadingIndicator: ReactElement;
-  iterator: AsyncIterableIterator<T>;
+  buffer?: BufferOptions;
   children: (items: Array<T>) => ReactNode;
+  iterator: AsyncIterableIterator<T>;
 };
 
 /**
@@ -23,8 +27,9 @@ type Props<T = any> = {
  */
 const LiveData: FC<Props> = ({
   LoadingIndicator,
-  iterator,
+  buffer,
   children,
+  iterator,
   ...rest
 }) => {
   const [items, setItems] = useState<Array<any>>([]);
@@ -36,7 +41,11 @@ const LiveData: FC<Props> = ({
     ref: loadingRef
   });
 
-  const loadingIndicatorIsVisible = useComponentIsVisible(loadingRef, outerRef);
+  const loadingIndicatorIsVisible = useComponentIsVisible(
+    loadingRef,
+    outerRef,
+    buffer
+  );
 
   useEffect(function() {
     let stillCaresAboutItem = true;
