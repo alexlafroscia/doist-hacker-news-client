@@ -5,13 +5,16 @@ import { LoadingIndicator } from "./components/LoadingIndicator";
 import { LiveData } from "./components/LiveData";
 import { HackerNewsClient } from "./HackerNewsClient";
 
-const client = new HackerNewsClient();
 
 const Feed = styled(LiveData)`
   height: 100vh;
 `;
 
-const App: React.FC = () => {
+type Props = {
+  client: HackerNewsClient;
+};
+
+const App: React.FC<Props> = ({ client }) => {
   const Loading = <LoadingIndicator>Loading...</LoadingIndicator>;
 
   return (
