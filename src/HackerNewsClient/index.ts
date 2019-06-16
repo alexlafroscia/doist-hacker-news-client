@@ -1,9 +1,20 @@
 import { Item } from "./Item";
 
 const BASE_URL = "https://hacker-news.firebaseio.com/v0/";
+const MS_PER_SECOND = 1000;
 
 function createItemURL(id: string): string {
   return `${BASE_URL}/item/${id}.json`;
+}
+
+function createItem(payload: any): Item {
+  return {
+    by: payload.by,
+    id: payload.id,
+    title: payload.title,
+    url: payload.url,
+    time: new Date(payload.time * MS_PER_SECOND)
+  };
 }
 
 export class HackerNewsClient {
@@ -21,7 +32,8 @@ export class HackerNewsClient {
     }
 
     const res = await fetch(createItemURL(id));
-    const item = (await res.json()) as Item;
+    const payload = await res.json();
+    const item = createItem(payload);
 
     this.cache.set(id, item);
 
