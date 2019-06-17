@@ -13,6 +13,7 @@ type HackerNewsItemProps = {
 
 const Title = styled(ExternalLink)`
   color: blue;
+  display: block;
   font-size: 1.2em;
   margin-bottom: 0.2em;
   text-decoration: none;
