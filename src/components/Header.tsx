@@ -7,6 +7,7 @@ export const Header = styled.header`
   background: ${hackerNewsOrange};
   color: white;
   display: flex;
+  flex-shrink: 0;
   flex-wrap: wrap;
   gap: 1em;
   padding: 1em;
