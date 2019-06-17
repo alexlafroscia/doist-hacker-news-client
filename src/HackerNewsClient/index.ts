@@ -1,10 +1,14 @@
 import { BasicMap } from "../types";
 import { Item, createItem } from "./Item";
 
-const BASE_URL = "https://hacker-news.firebaseio.com/v0/";
+const BASE_URL = "https://hacker-news.firebaseio.com/v0";
 
 function createItemURL(id: string): string {
   return `${BASE_URL}/item/${id}.json`;
+}
+
+function createFeedURL(collection: string): string {
+  return `${BASE_URL}/${collection}.json`;
 }
 
 type FeedCache = BasicMap<string, Array<string>>;
@@ -24,7 +28,7 @@ export class HackerNewsClient {
    *
    * @param id the ID of a HackerNews item
    */
-  private async fetchItem(id: string): Promise<Item> {
+  private async fetchItem(id: string): Promise<Item | undefined> {
     // Only request the item once
     if (this.itemCache.has(id)) {
       const cacheItem = this.itemCache.get(id)!;
@@ -34,13 +38,30 @@ export class HackerNewsClient {
       return cacheItem;
     }
 
-    const res = await fetch(createItemURL(id));
-    const payload = await res.json();
-    const item = createItem(payload);
+    try {
+      const res = await fetch(createItemURL(id));
+      const payload = await res.json();
 
-    this.itemCache.set(id, item);
+      // On occasion, the HN API returns `null` for an ID in the feed
+      // Maybe a deleted post?
+      if (!payload) {
+        return;
+      }
 
-    return item;
+      const item = createItem(payload);
+
+      this.itemCache.set(id, item);
+
+      return item;
+    } catch (e) {
+      // If we're offline and couldn't load the post the first time
+      // around, we could get an error when fetching offline
+      if (e.message === "Failed to fetch") {
+        return;
+      }
+
+      throw e;
+    }
   }
 
   /**
@@ -51,14 +72,15 @@ export class HackerNewsClient {
    *
    * @param url the URL to fetch the list of items from
    */
-  private async *fetchCollection(collectionName: string) {
+  private async *fetchCollection(
+    collectionName: string
+  ): AsyncIterableIterator<Item> {
     let ids;
 
     if (this.feedCache.has(collectionName)) {
       ids = this.feedCache.get(collectionName)!;
     } else {
-      const url = `${BASE_URL}${collectionName}.json`;
-      const resp = await fetch(url);
+      const resp = await fetch(createFeedURL(collectionName));
       ids = (await resp.json()) as Array<string>;
 
       this.feedCache.set(collectionName, ids);
@@ -66,7 +88,10 @@ export class HackerNewsClient {
 
     for (const id of ids) {
       const item = await this.fetchItem(id);
-      yield item;
+
+      if (item) {
+        yield item;
+      }
     }
   }
 
