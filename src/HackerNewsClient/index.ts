@@ -1,3 +1,4 @@
+import { BasicMap } from "../types";
 import { Item, createItem } from "./Item";
 
 const BASE_URL = "https://hacker-news.firebaseio.com/v0/";
@@ -6,8 +7,8 @@ function createItemURL(id: string): string {
   return `${BASE_URL}/item/${id}.json`;
 }
 
-type FeedCache = Map<string, Array<string>>;
-type ItemCache = Map<string, Item>;
+type FeedCache = BasicMap<string, Array<string>>;
+type ItemCache = BasicMap<string, Item>;
 
 export class HackerNewsClient {
   private feedCache: FeedCache;
@@ -26,7 +27,11 @@ export class HackerNewsClient {
   private async fetchItem(id: string): Promise<Item> {
     // Only request the item once
     if (this.itemCache.has(id)) {
-      return this.itemCache.get(id)!;
+      const cacheItem = this.itemCache.get(id)!;
+
+      cacheItem.time = new Date(cacheItem.time);
+
+      return cacheItem;
     }
 
     const res = await fetch(createItemURL(id));
@@ -46,16 +51,17 @@ export class HackerNewsClient {
    *
    * @param url the URL to fetch the list of items from
    */
-  private async *fetchCollection(url: string) {
+  private async *fetchCollection(collectionName: string) {
     let ids;
 
-    if (this.feedCache.has(url)) {
-      ids = this.feedCache.get(url)!;
+    if (this.feedCache.has(collectionName)) {
+      ids = this.feedCache.get(collectionName)!;
     } else {
+      const url = `${BASE_URL}${collectionName}.json`;
       const resp = await fetch(url);
       ids = (await resp.json()) as Array<string>;
 
-      this.feedCache.set(url, ids);
+      this.feedCache.set(collectionName, ids);
     }
 
     for (const id of ids) {
@@ -65,6 +71,6 @@ export class HackerNewsClient {
   }
 
   fetchNewStories() {
-    return this.fetchCollection(BASE_URL + "newstories.json");
+    return this.fetchCollection("newstories");
   }
 }

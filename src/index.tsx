@@ -2,9 +2,14 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
-import { HackerNewsClient } from "./HackerNewsClient";
 
-const client = new HackerNewsClient(new Map(), new Map());
+import { HackerNewsClient } from "./HackerNewsClient";
+import { LocalStorageMap } from "./utils/LocalStorageMap";
+
+const client = new HackerNewsClient(
+  new LocalStorageMap("feed"),
+  new LocalStorageMap("item")
+);
 
 ReactDOM.render(<App client={client} />, document.getElementById("root"));
 
