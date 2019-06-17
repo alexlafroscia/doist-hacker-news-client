@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 
 import { HackerNewsItem as BaseHackerNewsItem } from "./components/HackerNewsItem";
@@ -9,10 +9,12 @@ import {
   Title as HeaderTitle,
   Link as HeaderLink
 } from "./components/Header";
+import { ExternalLink } from "./components/ExternalLink";
+import { useBrowserOffline } from "./hooks/useBrowserOffline";
 
 import { HackerNewsClient } from "./HackerNewsClient";
 import { systemFont } from "./theme";
-import { ExternalLink } from "./components/ExternalLink";
+import { OfflineBanner } from "./components/OfflineBanner";
 
 const GlobalStyles = createGlobalStyle`
   html,
@@ -44,29 +46,37 @@ type Props = {
   client: HackerNewsClient;
 };
 
-const App: React.FC<Props> = ({ client }) => (
-  <Page>
-    <GlobalStyles />
-    <Header>
-      <HeaderTitle>Doist Hacker News Client</HeaderTitle>
-      <HeaderLink as={ExternalLink} href="https://alexlafroscia.com">
-        Created by Alex LaFroscia
-      </HeaderLink>
-      <HeaderLink
-        as={ExternalLink}
-        href="https://github.com/alexlafroscia/doist-hacker-news-clone"
+const App: React.FC<Props> = ({ client }) => {
+  const isOffline = useBrowserOffline();
+  const iterator = useMemo(() => client.fetchNewStories(), [client]);
+
+  return (
+    <Page>
+      <GlobalStyles />
+      <Header>
+        <HeaderTitle>Doist Hacker News Client</HeaderTitle>
+        <HeaderLink as={ExternalLink} href="https://alexlafroscia.com">
+          Created by Alex LaFroscia
+        </HeaderLink>
+        <HeaderLink
+          as={ExternalLink}
+          href="https://github.com/alexlafroscia/doist-hacker-news-clone"
+        >
+          Source Code
+        </HeaderLink>
+      </Header>
+      {isOffline ? <OfflineBanner /> : null}
+      <Feed
+        LoadingIndicator={LoadingIndicator}
+        iterator={iterator}
+        buffer={{ bottom: 200 }}
       >
-        Source Code
-      </HeaderLink>
-    </Header>
-    <Feed
-      LoadingIndicator={LoadingIndicator}
-      iterator={client.fetchNewStories()}
-      buffer={{ bottom: 200 }}
-    >
-      {items => items.map(item => <HackerNewsItem key={item.id} item={item} />)}
-    </Feed>
-  </Page>
-);
+        {items =>
+          items.map(item => <HackerNewsItem key={item.id} item={item} />)
+        }
+      </Feed>
+    </Page>
+  );
+};
 
 export default App;
