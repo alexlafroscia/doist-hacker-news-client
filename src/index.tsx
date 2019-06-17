@@ -5,9 +5,13 @@ import * as serviceWorker from "./serviceWorker";
 
 import { HackerNewsClient } from "./HackerNewsClient";
 import { LocalStorageMap } from "./utils/LocalStorageMap";
+import { ConditionalMapReader } from "./utils/ConditionalMapReader";
 
 const client = new HackerNewsClient(
-  new LocalStorageMap("feed"),
+  new ConditionalMapReader(
+    () => !navigator.onLine,
+    new LocalStorageMap("feed")
+  ),
   new LocalStorageMap("item")
 );
 
