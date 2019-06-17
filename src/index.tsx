@@ -4,7 +4,7 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import { HackerNewsClient } from "./HackerNewsClient";
 
-const client = new HackerNewsClient();
+const client = new HackerNewsClient(new Map(), new Map());
 
 ReactDOM.render(<App client={client} />, document.getElementById("root"));
 

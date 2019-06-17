@@ -6,8 +6,17 @@ function createItemURL(id: string): string {
   return `${BASE_URL}/item/${id}.json`;
 }
 
+type FeedCache = Map<string, Array<string>>;
+type ItemCache = Map<string, Item>;
+
 export class HackerNewsClient {
-  private cache = new Map<string, Item>();
+  private feedCache: FeedCache;
+  private itemCache: ItemCache;
+
+  constructor(feedCache: FeedCache, itemCache: ItemCache) {
+    this.feedCache = feedCache;
+    this.itemCache = itemCache;
+  }
 
   /**
    * Fetches a single "Item" from the Hacker News API
@@ -16,15 +25,15 @@ export class HackerNewsClient {
    */
   private async fetchItem(id: string): Promise<Item> {
     // Only request the item once
-    if (this.cache.has(id)) {
-      return this.cache.get(id)!;
+    if (this.itemCache.has(id)) {
+      return this.itemCache.get(id)!;
     }
 
     const res = await fetch(createItemURL(id));
     const payload = await res.json();
     const item = createItem(payload);
 
-    this.cache.set(id, item);
+    this.itemCache.set(id, item);
 
     return item;
   }
@@ -38,8 +47,16 @@ export class HackerNewsClient {
    * @param url the URL to fetch the list of items from
    */
   private async *fetchCollection(url: string) {
-    const resp = await fetch(url);
-    const ids = (await resp.json()) as Array<string>;
+    let ids;
+
+    if (this.feedCache.has(url)) {
+      ids = this.feedCache.get(url)!;
+    } else {
+      const resp = await fetch(url);
+      ids = (await resp.json()) as Array<string>;
+
+      this.feedCache.set(url, ids);
+    }
 
     for (const id of ids) {
       const item = await this.fetchItem(id);
