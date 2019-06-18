@@ -69,8 +69,6 @@ export class HackerNewsClient {
    *
    * A "collection" here is defined as an array of IDs that can be fetched
    * from a URL, such as the "new stories" or "top stories" lists
-   *
-   * @param url the URL to fetch the list of items from
    */
   private async *fetchCollection(
     collectionName: string
