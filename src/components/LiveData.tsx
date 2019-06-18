@@ -15,7 +15,7 @@ import {
 type Props<T = any> = {
   LoadingIndicator: ComponentType<RefAttributes<HTMLDivElement>>;
   buffer?: BufferOptions;
-  children: (items: Array<T>) => ReactNode;
+  children: (items: Array<T>, isDone: boolean) => ReactNode;
   iterator: AsyncIterableIterator<T>;
 };
 
@@ -33,6 +33,7 @@ const LiveData: FC<Props> = ({
   ...rest
 }) => {
   const [items, setItems] = useState<Array<any>>([]);
+  const [isDone, setIsDone] = useState<boolean>(false);
   const outerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
@@ -46,9 +47,13 @@ const LiveData: FC<Props> = ({
     let stillCaresAboutItem = true;
 
     if (loadingIndicatorIsVisible) {
-      iterator.next().then(({ value }) => {
+      iterator.next().then(({ value, done }) => {
         if (value && stillCaresAboutItem) {
           setItems([...items, value]);
+        }
+
+        if (done) {
+          setIsDone(true);
         }
       });
     }
@@ -60,8 +65,8 @@ const LiveData: FC<Props> = ({
 
   return (
     <div ref={outerRef} {...rest}>
-      {children(items)}
-      <LoadingIndicator ref={loadingRef} />
+      {children(items, isDone)}
+      {!isDone && <LoadingIndicator ref={loadingRef} />}
     </div>
   );
 };

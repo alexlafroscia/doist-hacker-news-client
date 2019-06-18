@@ -42,6 +42,23 @@ const HackerNewsItem = styled(BaseHackerNewsItem)`
   margin-bottom: 20px;
 `;
 
+const NoMoreData = styled.div`
+  color: darkslategray;
+  font-size: 1.1em;
+  font-style: italic;
+  text-align: center;
+
+  &::before {
+    content: "~";
+    padding-right: 0.5em;
+  }
+
+  &::after {
+    content: "~";
+    padding-left: 0.5em;
+  }
+`;
+
 type Props = {
   client: HackerNewsClient;
 };
@@ -71,9 +88,14 @@ const App: React.FC<Props> = ({ client }) => {
         iterator={iterator}
         buffer={{ bottom: 200 }}
       >
-        {items =>
-          items.map(item => <HackerNewsItem key={item.id} item={item} />)
-        }
+        {(items, isDone) => (
+          <>
+            {items.map(item => (
+              <HackerNewsItem key={item.id} item={item} />
+            ))}
+            {isDone && <NoMoreData>Fin</NoMoreData>}
+          </>
+        )}
       </Feed>
     </Page>
   );
