@@ -59,6 +59,16 @@ const NoMoreData = styled.div`
   }
 `;
 
+const NoPosts = styled.div`
+  background: lightgray;
+  padding: 2em;
+  font-size: 2em;
+  margin: 0 auto;
+  text-align: center;
+  border-radius: 10px;
+  width: 40%;
+`;
+
 type Props = {
   client: HackerNewsClient;
 };
@@ -88,14 +98,21 @@ const App: React.FC<Props> = ({ client }) => {
         iterator={iterator}
         buffer={{ bottom: 200 }}
       >
-        {(items, isDone) => (
-          <>
-            {items.map(item => (
-              <HackerNewsItem key={item.id} item={item} />
-            ))}
-            {isDone && <NoMoreData>Fin</NoMoreData>}
-          </>
-        )}
+        {(items, isDone) => {
+          return (
+            <>
+              {items.map(item => (
+                <HackerNewsItem key={item.id} item={item} />
+              ))}
+              {isDone &&
+                (items.length ? (
+                  <NoMoreData>Fin</NoMoreData>
+                ) : (
+                  <NoPosts>No Posts to Show</NoPosts>
+                ))}
+            </>
+          );
+        }}
       </Feed>
     </Page>
   );
