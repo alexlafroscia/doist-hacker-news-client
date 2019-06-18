@@ -47,7 +47,7 @@ const LiveData: FC<Props> = ({
 
     if (loadingIndicatorIsVisible) {
       iterator.next().then(({ value }) => {
-        if (stillCaresAboutItem) {
+        if (value && stillCaresAboutItem) {
           setItems([...items, value]);
         }
       });
