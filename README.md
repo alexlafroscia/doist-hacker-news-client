@@ -69,6 +69,14 @@ Due to the time considerations, the offline support is not as great as it could 
 
 I wrote some tests using Jest around the caching logic, since that was harder to test manually by running the application. However, with more time I would like to write more unit tests for the `LiveData` component and the interaction with the loading indicator becoming visible and invisible.
 
+### Better Animations
+
+I don't have a lot of experience with CSS animations (the loading indicator here is some of the first I've written in a long time). If given more time, I would like to explore introducing an animation when loading a new item into the feed, which I think would make the experience of scrolling quickly to the bottom better.
+
+### "Add to Homescreen"
+
+Since the website works well offline, with full caching of the assets, it is a great candidate for a nice treatment when adding the app to the homescreen of a mobile device. Specifically, it would be great to have a nice icon for it and to open the application in a separate window on a mobile device, rather than opening the web browser (as Twitter does on iOS).
+
 ## Challenges
 
 ### API Quirks
